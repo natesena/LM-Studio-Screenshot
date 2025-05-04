@@ -54,6 +54,24 @@ node screenshot-send.js --window "Window Title"
 - macOS
 - Node.js 16+
 
+## Building and Installing the Electron App
+
+1. **Install dependencies:**
+   ```sh
+   npm install
+   ```
+2. **Build the app:**
+   ```sh
+   npm run build
+   ```
+   This will build the React frontend and package the Electron app. The output can be found in the `dist/` folder.
+3. **Run the packaged app:**
+   - On macOS, open the `.app` or `.dmg` file in the `dist/` folder.
+   - On Windows, open the `.exe` file in the `dist/` folder.
+   - On Linux, use the `.AppImage` or other output in the `dist/` folder.
+
+**Note:** The app will use the custom icon you placed in `assets/LM_Screenshot.png`. For best results, use platform-specific icon formats (`.icns` for macOS, `.ico` for Windows, `.png` for Linux).
+
 ## How it works
 
 - Uses [`screenshot-desktop`](https://www.npmjs.com/package/screenshot-desktop) to capture screenshots

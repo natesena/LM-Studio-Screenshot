@@ -8,7 +8,10 @@
     "send-screenshot": "node screenshot-send.js",
     "start": "concurrently -k \"npm:react-dev\" \"npm:electron-dev\"",
     "electron-dev": "NODE_ENV=development electron .",
-    "react-dev": "vite"
+    "react-dev": "vite",
+    "build:react": "vite build",
+    "build:electron": "electron-builder",
+    "build": "npm run build:react && npm run build:electron"
   },
   "dependencies": {
     "@lmstudio/sdk": "^1.1.1",
@@ -24,7 +27,29 @@
   "devDependencies": {
     "concurrently": "^9.1.2",
     "electron": "^29.4.6",
+    "electron-builder": "^26.0.12",
     "electron-reload": "^2.0.0-alpha.1",
     "vite": "^6.3.4"
+  },
+  "build": {
+    "appId": "com.yourdomain.screenshot-sender",
+    "mac": {
+      "icon": "assets/LM_Screenshot.png"
+    },
+    "win": {
+      "icon": "assets/LM_Screenshot.png"
+    },
+    "linux": {
+      "icon": "assets/LM_Screenshot.png"
+    },
+    "files": [
+      "dist/**/*",
+      "main.js",
+      "preload.js",
+      "server.js",
+      "screenshot-send.js",
+      "node_modules/**/*",
+      "package.json"
+    ]
   }
 }

@@ -11,8 +11,8 @@ yarn-error.log*
 Thumbs.db
 
 # Electron build artifacts
-dist/
-build/
+# dist/
+# build/
 
 # Environment files
 .env
