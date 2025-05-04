@@ -12,7 +12,10 @@ export default function ChatMessage({ role, imagePath, content, base64 }) {
       <div className="avatar">{role === "user" ? "🖼️" : "🤖"}</div>
       <div className="chat-bubble">
         {role === "user" ? (
-          <img src={src} alt="Screenshot" />
+          <>
+            {src && <img src={src} alt="Screenshot" />}
+            {content && <div style={{ marginTop: src ? 8 : 0 }}>{content}</div>}
+          </>
         ) : (
           <div>{content}</div>
         )}

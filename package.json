@@ -23,6 +23,7 @@
   "devDependencies": {
     "concurrently": "^9.1.2",
     "electron": "^29.4.6",
+    "electron-reload": "^2.0.0-alpha.1",
     "vite": "^6.3.4"
   }
 }

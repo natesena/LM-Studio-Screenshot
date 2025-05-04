@@ -10,9 +10,6 @@ export default function ActionButtons({
       <button id="screenshotBtn" onClick={onTakeScreenshot}>
         Take Screenshot
       </button>
-      <button id="sendBtn" onClick={onSendToLLM} disabled={sendDisabled}>
-        Send to LLM
-      </button>
     </div>
   );
 }

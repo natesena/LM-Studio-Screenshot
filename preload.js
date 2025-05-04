@@ -5,4 +5,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
     ipcRenderer.invoke("take-screenshot", windowTitle),
   sendToLLM: (params) => ipcRenderer.invoke("send-to-llm", params),
   getFileStats: (filePath) => ipcRenderer.invoke("get-file-stats", filePath),
+  onTriggerScreenshot: (callback) =>
+    ipcRenderer.on("trigger-screenshot", callback),
 });
