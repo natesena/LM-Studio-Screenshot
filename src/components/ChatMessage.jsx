@@ -1,4 +1,5 @@
 import React from "react";
+import ReactMarkdown from "react-markdown";
 
 export default function ChatMessage({ role, imagePath, content, base64 }) {
   let src = null;
@@ -17,7 +18,7 @@ export default function ChatMessage({ role, imagePath, content, base64 }) {
             {content && <div style={{ marginTop: src ? 8 : 0 }}>{content}</div>}
           </>
         ) : (
-          <div>{content}</div>
+          <ReactMarkdown>{content}</ReactMarkdown>
         )}
       </div>
     </div>
