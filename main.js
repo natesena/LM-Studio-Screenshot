@@ -17,7 +17,11 @@ function createWindow() {
       contextIsolation: true,
     },
   });
-  win.loadFile("index.html");
+  if (process.env.NODE_ENV === "development") {
+    win.loadURL("http://localhost:5173");
+  } else {
+    win.loadFile("index.html");
+  }
 }
 
 app.whenReady().then(() => {

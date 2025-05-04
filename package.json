@@ -6,17 +6,23 @@
   "scripts": {
     "start-server": "node server.js",
     "send-screenshot": "node screenshot-send.js",
-    "start": "electron ."
+    "start": "concurrently -k \"npm:react-dev\" \"npm:electron-dev\"",
+    "electron-dev": "NODE_ENV=development electron .",
+    "react-dev": "vite"
   },
   "dependencies": {
     "@lmstudio/sdk": "^1.1.1",
     "axios": "^1.6.8",
     "express": "^4.18.2",
     "multer": "^1.4.5-lts.1",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
     "screenshot-desktop": "^1.14.0",
     "yargs": "^17.7.2"
   },
   "devDependencies": {
-    "electron": "^29.4.6"
+    "concurrently": "^9.1.2",
+    "electron": "^29.4.6",
+    "vite": "^6.3.4"
   }
 }
