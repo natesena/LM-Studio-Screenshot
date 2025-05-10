@@ -4,6 +4,7 @@ import ScreenshotPreview from "./components/ScreenshotPreview";
 import ActionButtons from "./components/ActionButtons";
 import Chat from "./components/Chat";
 import SettingsModal from "./components/SettingsModal";
+import ScreenSelector from "./components/ScreenSelector";
 
 const defaultSettings = {
   model: "gemma-3-4b-it-qat",
@@ -11,6 +12,7 @@ const defaultSettings = {
   temperature: 0.7,
   windowTitle: "",
   prompt: "",
+  screenId: "",
 };
 
 const initialConversation = () => ({
@@ -33,6 +35,7 @@ export default function App() {
   );
   const [sending, setSending] = useState(false);
   const chatInputRef = useRef(null);
+  const [availableScreens, setAvailableScreens] = useState([]);
 
   const currentConversation = conversations.find(
     (c) => c.id === currentConversationId
@@ -57,11 +60,24 @@ export default function App() {
     setSettings((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Wire up Electron API for screenshot
+  useEffect(() => {
+    window.electronAPI.listScreens().then((screens) => {
+      setAvailableScreens(screens);
+      // If no screen is selected, pre-select the first available screen
+      setSettings((prev) => {
+        if (!prev.screenId && screens.length > 0) {
+          return { ...prev, screenId: screens[0].id };
+        }
+        return prev;
+      });
+    });
+  }, []);
+
   const handleTakeScreenshot = async () => {
     try {
       const result = await window.electronAPI.takeScreenshot(
-        settings.windowTitle || undefined
+        settings.windowTitle || undefined,
+        settings.screenId || undefined
       );
       const stats = await window.electronAPI.getFileStats(result.tmpPath);
       setScreenshot({
@@ -74,7 +90,6 @@ export default function App() {
     }
   };
 
-  // Wire up Electron API for LLM
   const handleSendToLLM = async () => {
     if (!screenshot.imagePath) return;
     setSending(true);
@@ -99,7 +114,6 @@ export default function App() {
         temperature: settings.temperature,
         imagePath: screenshot.imagePath,
       });
-      // Remove the 'Thinking...' message and add the real response
       setConversations((prev) =>
         prev.map((conv) =>
           conv.id === currentConversationId
@@ -139,7 +153,6 @@ export default function App() {
   };
 
   const handleUserSend = async (text) => {
-    // Add user message and 'Thinking...' to current conversation
     setConversations((prev) =>
       prev.map((conv) =>
         conv.id === currentConversationId
@@ -162,7 +175,6 @@ export default function App() {
     setScreenshot({ imagePath: null, fileSizeBytes: null, base64: null });
     setSending(true);
     try {
-      // Build full conversation history for LLM
       const messagesForLLM = currentConversation.messages.map((msg) => ({
         role: msg.role,
         content: msg.content,
@@ -234,6 +246,11 @@ export default function App() {
         currentConversationId={currentConversationId}
         onSwitchConversation={handleSwitchConversation}
         onNewConversation={handleNewConversation}
+      />
+      <ScreenSelector
+        screens={availableScreens}
+        selectedScreenId={settings.screenId}
+        onSelect={(id) => setSettings((prev) => ({ ...prev, screenId: id }))}
       />
       <ScreenshotPreview
         imagePath={screenshot.imagePath}

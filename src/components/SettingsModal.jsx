@@ -1,20 +1,59 @@
 import React from "react";
 
+const AVAILABLE_MODELS = ["gemma-3-4b-it-qat", "gemma-3-27b-it-qat"];
+
 export default function SettingsModal({
   open,
   settings,
   onChange,
   onSave,
   onCancel,
+  availableScreens = [],
 }) {
   if (!open) return null;
+
+  const handleModelChange = (e) => {
+    onChange({
+      target: {
+        name: "model",
+        value: e.target.value,
+      },
+    });
+  };
+
+  const handleScreenChange = (e) => {
+    onChange({
+      target: {
+        name: "screenId",
+        value: e.target.value,
+      },
+    });
+  };
+
   return (
     <>
       <div className="modal-bg" onClick={onCancel} />
       <div className="modal" style={{ display: "flex" }}>
         <label>
           Model
-          <input name="model" value={settings.model} onChange={onChange} />
+          <select
+            name="model"
+            value={settings.model}
+            onChange={handleModelChange}
+            style={{
+              width: "100%",
+              padding: "0.5em",
+              borderRadius: "5px",
+              border: "1px solid #ddd",
+              fontSize: "1em",
+            }}
+          >
+            {AVAILABLE_MODELS.map((model) => (
+              <option key={model} value={model}>
+                {model}
+              </option>
+            ))}
+          </select>
         </label>
         <label>
           Max Tokens

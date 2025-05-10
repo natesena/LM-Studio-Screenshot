@@ -27,6 +27,10 @@ This project lets you quickly take a screenshot of your Mac (entire screen or an
    ```
    By default, this captures the entire screen. See below for options.
 
+> **Note:** Start the app with `node server.js` in one terminal, then run `node screenshot-send.js` in another.
+
+> **Note:** To start the Electron app in development, just run `npm start`.
+
 ## Usage
 
 ### Take a screenshot of the entire screen

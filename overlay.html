@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Select Area</title>
+  <style>
+    html, body {
+      margin: 0; padding: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.15); cursor: crosshair;
+    }
+    #selection {
+      position: absolute;
+      border: 2px dashed #3b82f6;
+      background: rgba(59,130,246,0.15);
+      pointer-events: none;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+  <div id="selection" style="display:none;"></div>
+  <script>
+    const { ipcRenderer } = require('electron');
+    let startX, startY, endX, endY, selecting = false;
+    const selection = document.getElementById('selection');
+    document.addEventListener('mousedown', (e) => {
+      selecting = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      selection.style.left = startX + 'px';
+      selection.style.top = startY + 'px';
+      selection.style.width = '0px';
+      selection.style.height = '0px';
+      selection.style.display = 'block';
+    });
+    document.addEventListener('mousemove', (e) => {
+      if (!selecting) return;
+      endX = e.clientX;
+      endY = e.clientY;
+      const x = Math.min(startX, endX);
+      const y = Math.min(startY, endY);
+      const w = Math.abs(endX - startX);
+      const h = Math.abs(endY - startY);
+      selection.style.left = x + 'px';
+      selection.style.top = y + 'px';
+      selection.style.width = w + 'px';
+      selection.style.height = h + 'px';
+    });
+    document.addEventListener('mouseup', (e) => {
+      if (!selecting) return;
+      selecting = false;
+      endX = e.clientX;
+      endY = e.clientY;
+      const x = Math.min(startX, endX);
+      const y = Math.min(startY, endY);
+      const w = Math.abs(endX - startX);
+      const h = Math.abs(endY - startY);
+      selection.style.display = 'none';
+      if (w > 5 && h > 5) {
+        ipcRenderer.send('region-selected', { x, y, width: w, height: h });
+      } else {
+        ipcRenderer.send('region-cancel');
+      }
+    });
+    // ESC to cancel
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        ipcRenderer.send('region-cancel');
+      }
+    });
+  </script>
+</body>
+</html> 
