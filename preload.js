@@ -8,4 +8,5 @@ contextBridge.exposeInMainWorld("electronAPI", {
   getFileStats: (filePath) => ipcRenderer.invoke("get-file-stats", filePath),
   onTriggerScreenshot: (callback) =>
     ipcRenderer.on("trigger-screenshot", callback),
+  checkLMStudioAvailable: () => ipcRenderer.invoke("check-lmstudio-available"),
 });

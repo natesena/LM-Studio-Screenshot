@@ -36,6 +36,8 @@ export default function App() {
   const [sending, setSending] = useState(false);
   const chatInputRef = useRef(null);
   const [availableScreens, setAvailableScreens] = useState([]);
+  const [lmStudioAvailable, setLMStudioAvailable] = useState(true);
+  const [lmStudioError, setLMStudioError] = useState("");
 
   const currentConversation = conversations.find(
     (c) => c.id === currentConversationId
@@ -61,6 +63,11 @@ export default function App() {
   };
 
   useEffect(() => {
+    // Check LM Studio availability on mount
+    window.electronAPI.checkLMStudioAvailable().then((res) => {
+      setLMStudioAvailable(res.available);
+      setLMStudioError(res.error || "");
+    });
     window.electronAPI.listScreens().then((screens) => {
       setAvailableScreens(screens);
       // If no screen is selected, pre-select the first available screen
@@ -240,6 +247,29 @@ export default function App() {
 
   return (
     <div className="container">
+      {!lmStudioAvailable && (
+        <div
+          className="lmstudio-error"
+          style={{
+            background: "#fee",
+            color: "#b00",
+            padding: "1em",
+            borderRadius: 8,
+            marginBottom: 16,
+            border: "1px solid #fbb",
+            textAlign: "center",
+            fontWeight: 600,
+          }}
+        >
+          LM Studio is not running or not reachable. Please start LM Studio to
+          use this app.
+          {lmStudioError && (
+            <div style={{ fontSize: "0.9em", marginTop: 4, color: "#a33" }}>
+              {lmStudioError}
+            </div>
+          )}
+        </div>
+      )}
       <Header
         onOpenSettings={handleOpenSettings}
         conversations={conversations}

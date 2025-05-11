@@ -250,3 +250,14 @@ ipcMain.handle("get-file-stats", async (event, filePath) => {
   const stats = fs.statSync(filePath);
   return { size: stats.size };
 });
+
+ipcMain.handle("check-lmstudio-available", async () => {
+  console.log("check-lmstudio-available handler called");
+  try {
+    const models = await client.system.listDownloadedModels();
+    console.log("LM Studio downloaded models:", models);
+    return { available: true, modelsAvailable: models.length > 0 };
+  } catch (e) {
+    return { available: false, modelsAvailable: false, error: e.message };
+  }
+});
