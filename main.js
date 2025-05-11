@@ -178,45 +178,52 @@ ipcMain.handle("select-region", async () => {
 });
 
 ipcMain.handle("take-screenshot", async (event, windowTitle, screenId) => {
-  let opts = {};
-  if (windowTitle) {
-    const sources = await screenshot.listWindows();
-    const win = sources.find((w) => w.name.includes(windowTitle));
-    if (!win) throw new Error("Window not found: " + windowTitle);
-    opts = { screen: win.id };
-  } else if (screenId && screenId !== "region") {
-    opts = { screen: screenId };
+  try {
+    let opts = {};
+    if (windowTitle) {
+      const sources = await screenshot.listWindows();
+      const win = sources.find((w) => w.name.includes(windowTitle));
+      if (!win) throw new Error("Window not found: " + windowTitle);
+      opts = { screen: win.id };
+    } else if (screenId && screenId !== "region") {
+      opts = { screen: screenId };
+    }
+    // Handle region selection
+    if (screenId === "region") {
+      // 1. Trigger region selection overlay
+      const region = await selectRegion();
+      if (!region) throw new Error("Region selection cancelled");
+      // 2. Capture full screen
+      const img = await screenshot();
+      // 3. Crop to region
+      const cropped = await sharp(img)
+        .extract({
+          left: Math.round(region.x),
+          top: Math.round(region.y),
+          width: Math.round(region.width),
+          height: Math.round(region.height),
+        })
+        .png()
+        .toBuffer();
+      // 4. Save to temp file
+      const tmpPath = path.join(
+        os.tmpdir(),
+        `screenshot_region_${Date.now()}.png`
+      );
+      fs.writeFileSync(tmpPath, cropped);
+      return { base64: cropped.toString("base64"), tmpPath };
+    }
+    // Default: capture as before
+    const img = await screenshot(opts);
+    const tmpPath = path.join(os.tmpdir(), `screenshot_${Date.now()}.png`);
+    fs.writeFileSync(tmpPath, img);
+    return { base64: img.toString("base64"), tmpPath };
+  } catch (e) {
+    if (e.message !== "Region selection cancelled") {
+      console.error("Error occurred in handler for 'take-screenshot':", e);
+    }
+    throw e;
   }
-  // Handle region selection
-  if (screenId === "region") {
-    // 1. Trigger region selection overlay
-    const region = await selectRegion();
-    if (!region) throw new Error("Region selection cancelled");
-    // 2. Capture full screen
-    const img = await screenshot();
-    // 3. Crop to region
-    const cropped = await sharp(img)
-      .extract({
-        left: Math.round(region.x),
-        top: Math.round(region.y),
-        width: Math.round(region.width),
-        height: Math.round(region.height),
-      })
-      .png()
-      .toBuffer();
-    // 4. Save to temp file
-    const tmpPath = path.join(
-      os.tmpdir(),
-      `screenshot_region_${Date.now()}.png`
-    );
-    fs.writeFileSync(tmpPath, cropped);
-    return { base64: cropped.toString("base64"), tmpPath };
-  }
-  // Default: capture as before
-  const img = await screenshot(opts);
-  const tmpPath = path.join(os.tmpdir(), `screenshot_${Date.now()}.png`);
-  fs.writeFileSync(tmpPath, img);
-  return { base64: img.toString("base64"), tmpPath };
 });
 
 ipcMain.handle(

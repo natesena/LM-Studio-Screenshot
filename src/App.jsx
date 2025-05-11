@@ -93,6 +93,15 @@ export default function App() {
         base64: result.base64,
       });
     } catch (err) {
+      if (
+        err &&
+        (err.message === "Region selection cancelled" ||
+          (typeof err === "string" &&
+            err.includes("Region selection cancelled")))
+      ) {
+        // User cancelled region selection: do nothing or show a gentle notice
+        return;
+      }
       alert("Screenshot failed: " + err);
     }
   };
